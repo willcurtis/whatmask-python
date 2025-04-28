@@ -69,8 +69,8 @@ brew install whois
 ### Standard Mode
 
 ```bash
-./getmask.py 255.255.255.0
-./getmask.py /26
+./getmask.py 192.168.1.10 255.255.255.0
+./getmask.py 192.168.1.10/255.255.255.0
 ./getmask.py 192.168.1.10/24
 ```
 
