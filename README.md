@@ -46,6 +46,13 @@ sudo cp getmask.py /usr/local/bin/whatmask
 
 Now you can run `whatmask` from anywhere.
 
+### Install via Homebrew:
+
+```bash
+brew tap willcurtis/tools
+brew install mac-lookup-tool
+```
+
 ## Dependencies
 
 - **Python 3.6+**
