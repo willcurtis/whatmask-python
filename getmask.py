@@ -14,7 +14,7 @@ WARNING = "\033[93m"
 # Unicode symbol
 WARN_SYMBOL = "\u26A0\uFE0F"
 
-def parse_mask(mask_str):
+def parse_mask(mask_str, suppress_ip_warning=False):
     try:
         if mask_str.startswith("0x"):
             mask_int = int(mask_str, 16)
@@ -25,12 +25,14 @@ def parse_mask(mask_str):
         else:
             parts = mask_str.split(".")
             if len(parts) == 4:
-                # Check if it's a valid netmask or mistakenly an IP address
                 try:
                     ipaddress.IPv4Address(mask_str)
-                    print(f"{WARNING}Input {mask_str} looks like an IP address, not a netmask.{RESET}")
-                    print(f"{WARNING}Hint: Use IP/mask format like {mask_str}/24{RESET}")
-                    sys.exit(1)
+                    if not suppress_ip_warning:
+                        print(f"{WARNING}Input {mask_str} looks like an IP address, not a netmask.{RESET}")
+                        print(f"{WARNING}Hint: Use IP/mask format like {mask_str}/24{RESET}")
+                        sys.exit(1)
+                    else:
+                        return mask_str
                 except ipaddress.AddressValueError:
                     pass
                 if any(int(p) > 255 for p in parts):
@@ -105,7 +107,7 @@ def system_whois_lookup(ip_str):
         print(f"{WARNING}System WHOIS lookup failed: {e}{RESET}")
 
 def network_info(ip_str, mask_str, brief=False, do_whois=False):
-    mask = parse_mask(mask_str)
+    mask = parse_mask(mask_str, suppress_ip_warning=True)
     network = ipaddress.IPv4Network(f"{ip_str}/{mask}", strict=False)
 
     netmask = network.netmask
@@ -142,7 +144,7 @@ def network_info(ip_str, mask_str, brief=False, do_whois=False):
 
 def main():
     if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} [--brief] [--whois] <mask|ip/mask>")
+        print(f"Usage: {sys.argv[0]} [--brief] [--whois] <mask|ip/mask> [netmask]")
         sys.exit(1)
 
     brief = False
@@ -158,10 +160,14 @@ def main():
         args.remove("--whois")
 
     if not args:
-        print(f"Usage: {sys.argv[0]} [--brief] [--whois] <mask|ip/mask>")
+        print(f"Usage: {sys.argv[0]} [--brief] [--whois] <mask|ip/mask> [netmask]")
         sys.exit(1)
 
-    arg = args[0]
+    if len(args) == 2:
+        # Two arguments: IP + Netmask
+        arg = f"{args[0]}/{args[1]}"
+    else:
+        arg = args[0]
 
     if '/' in arg:
         ip_part, mask_part = arg.split('/', 1)
