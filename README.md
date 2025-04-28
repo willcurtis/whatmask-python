@@ -115,8 +115,8 @@ Displays organization and country from the system's `whois` command:
 Example:
 
 ```text
-⚠️ Input 239.0.0.1 looks like an IP address, not a netmask.
-⚠️ Hint: Use IP/mask format like 239.0.0.1/24
+⚠️ Input 192.168.0.1 looks like an IP address, not a netmask.
+⚠️ Hint: Use IP/mask format like 192.168.0.1/24
 ```
 
 ## License
